@@ -20,3 +20,4 @@ The project aims to investigate the Kondo Lattice Model, which describes the int
 
 - [Wikipedia article on the Kondo model](https://en.wikipedia.org/wiki/Kondo_model)
 - [T. Sato, F. F. Assaad, and T. Grover, “Quantum Monte Carlo Simulations of Frustrated Kondo Lattice Models”, Phys. Rev. Lett., vol. 120, no. 10, Mar. 2018.](https://arxiv.org/abs/1711.03116)
+- [M. Lavagna and C. Pépin, “The Kondo Lattice Model”, Acta Phys. Pol. B, vol. 29, no. 12, Nov. 1998.](https://hal.science/hal-01896229/document)
