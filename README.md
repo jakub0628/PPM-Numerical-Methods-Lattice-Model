@@ -46,3 +46,4 @@ E_i = - \sum_{\langle j \rangle}\mathbf{s}_{i} \cdot \mathbf{s}_{j}
 - [x] Find out how to implement the model
 - [ ] Divide the tasks
 - [ ] Implement the basic version of the algorithm
+- [ ] drink coffee
