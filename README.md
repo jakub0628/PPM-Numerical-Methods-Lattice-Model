@@ -22,7 +22,7 @@ If we ignore the external field (i.e. $`\forall_{i \in \Lambda} ~ h_i = 0`$) and
 \mathcal{H} = - \sum_{\langle i,j \rangle}\mathbf{s}_{i} \cdot \mathbf{s}_{j}
 ```
 
-Hence, the energy of each site $i$ with $2d$ neigbours ${\langle j \rangle}$ can be expressed as
+Hence, the energy of each site $i$ with $2d$ neighbours ${\langle j \rangle}$ can be expressed as
 
 ```math
 E_i = - \sum_{\langle j \rangle}\mathbf{s}_{i} \cdot \mathbf{s}_{j}
@@ -30,10 +30,11 @@ E_i = - \sum_{\langle j \rangle}\mathbf{s}_{i} \cdot \mathbf{s}_{j}
 
 ## Metropolis–Hastings algorithm
 
-1. For a given site calculate $`E_i`$.
-2. If $`E_i < 0`$ (i.e. the potential energy of the neighbour interactions is negative) flip the spin $`\mathbf{s}_{i}`$.
-3. Also, if $`\exp(-\beta E_i ) > p`$, where $`p \in [0, 1]`$ is a random number, flip the spin (thermal flipping).
-4. Repeat for all sites.
+1. For a randomly site $`i`$ calculate the energy difference after the spin $`\mathbf{s}_{i}`$ is flipped ($`\mathbf{s}_{i} \to -\mathbf{s}_{i}`$):
+ $`\Delta E_i = E_i(-\mathbf{s}_{i}) - E_i(\mathbf{s}_{i})`$.
+2. If $`\Delta E_i < 0`$ (i.e. the flip is energetically favourable) flip the spin.
+3. Otherwise, even if the flip is energetically unfavourable, it can still happen because of a random thermal fluctuation with the probability $`p_{\text{B}} = \exp(-\beta E_i).`$ Hence, if $`p_{\text{B}} > p`$, where $`p \in [0, 1]`$ is a random number chosen from an uniform distribution, also flip the spin.
+4. Repeat the procedure.
 
 ## Resources
 - [Wikipedia article on the $n$-vector model](https://en.wikipedia.org/wiki/N-vector_model)
