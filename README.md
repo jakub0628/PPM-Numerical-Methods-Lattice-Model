@@ -39,6 +39,9 @@ E_i = - \sum_{\langle j \rangle}\mathbf{s}_{i} \cdot \mathbf{s}_{j}
 - [Wikipedia article on the $n$-vector model](https://en.wikipedia.org/wiki/N-vector_model)
 - [XY (2-vector) model simulation](https://kjslag.github.io/XY/)
 - Stanley, H. E. (1968). "Dependence of Critical Properties upon Dimensionality of Spins". *Phys. Rev. Lett*. **20** (12): 589–592. [doi:10.1103/PhysRevLett.20.589](https://doi.org/10.1103%2FPhysRevLett.20.589)
+## Libraries
+- https://github.com/genkuroki/Ising2D.jl
+- https://juliapackages.com/p/isingmodels
 
 # TODO
 
