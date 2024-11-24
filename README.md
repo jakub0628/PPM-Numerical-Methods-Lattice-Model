@@ -48,6 +48,9 @@ E_i = - \sum_{\langle j \rangle}\mathbf{s}_{i} \cdot \mathbf{s}_{j}
 
 - [x] Establish general aims of the project 
 - [x] Find out how to implement the model
-- [ ] Divide the tasks
-- [ ] Implement the basic version of the algorithm
-- [ ] drink coffee
+- [x] Divide the tasks
+- [x] Implement the basic version of the algorithm
+- [ ] Treat different $n$ cases
+- [ ] Find physical interpretation
+- [ ] Make visualisations
+- [ ] Make presentation
