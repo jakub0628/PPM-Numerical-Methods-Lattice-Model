@@ -1,0 +1,162 @@
+\documentclass[]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2cm]{geometry}
+\usepackage{float}
+\usepackage{framed}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{cancel}
+\usepackage[bottom]{footmisc}
+\usepackage{titling}
+
+% Define custom colours
+\definecolor{cern-blue}{RGB}{0,51,160}
+\definecolor{cern-violet}{RGB}{110,36,102}
+
+\usepackage[colorlinks=true,citecolor=cern-blue,linkcolor=cern-violet,urlcolor=cern-blue]{hyperref}%
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{mathtools}
+\usepackage{physics}
+\usepackage[font=small, labelfont=bf]{caption}
+\setlength{\droptitle}{-1.5cm}
+\numberwithin{equation}{section}
+
+% include bibliography in table of contents
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex} % Using IEEE standard
+\addbibresource{biblio.bib} % Point to the references folder
+\renewcommand{\refname}{Bibliography}
+
+\newcommand{\qedwhite}{\hfill \ensuremath{\Box}}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\usepackage[most]{tcolorbox}
+\definecolor{cern}{RGB}{155,174,219}
+
+\tcbsetforeverylayer{
+  fonttitle=\bfseries,
+  left=.005\textwidth,
+  right=.005\textwidth,
+  breakable,
+  enhanced,
+  coltitle=white,
+  colframe=cern,
+  colback=white,
+}
+
+% Include coloured framing of examples
+\usepackage{amsthm}
+\newtheoremstyle{break}
+  {\topsep}{\topsep}%
+  {}{}%
+  {\bfseries}{}%
+  {\newline}{}%
+\theoremstyle{break}
+\newtheorem*{example}{Example}
+\newtheorem*{spproof}{Proof}
+\usepackage[framemethod=TikZ]{mdframed}
+
+\surroundwithmdframed[
+  topline=false,
+  rightline=false,
+  bottomline=false,
+  linecolor=cern-blue, 
+  skipabove=\medskipamount,
+  skipbelow=\medskipamount
+]{example}
+
+\surroundwithmdframed[
+  topline=false,
+  rightline=false,
+  bottomline=false,
+  linecolor=cern-violet, 
+  skipabove=\medskipamount,
+  skipbelow=\medskipamount
+]{spproof}
+
+
+\newcommand{\bk}{\par\null\par\noindent}
+
+
+\title{\textbf{Investigation of the n-Vector Model}}
+\author{Jakub Aleksander Kwaśniak}
+\date{\today}
+
+\fancypagestyle{plain}{
+\fancyhead[R]{PPM 2024/2025}
+\fancyhead[C]{n-Vector Model}
+\fancyhead[L]{Numerical Methods for Physics}
+}
+\pagestyle{plain}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+The n-vector model, also referred to as $O(n)$  model describes the interaction of classical spins on a lattice, developed as a generalisation of the Lenz-Ising model by H. E. Stanley in 1968 \cite{stanley-1968}. The relevant particular cases of the $n$-vector model are highlighted in the table \ref{tab:table} below.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+         \hline  \boldmath $n$ \unboldmath &  \textbf{Name}\\ \hline 
+         0 & Self-avoiding walk \\ \hline 
+         1 &  Lenz-Ising model \\ \hline 
+         2 &  XY Model \\ \hline 
+         3 &  Heisenberg model \\ \hline 
+         4 & Higgs sector model \\ \hline
+    \end{tabular}
+    \caption{Summary of particular cases of the $n$-vector model.}
+    \label{tab:table}
+\end{table}
+The aim of this work is to provide insight behind the various $n$-cases, in direct comparison to the well-established Lenz-Ising model.
+
+\section{Lenz-Ising Model ($n=1$)}
+The Ising model, was first posed as a problem by Wilhelm Lenz in 1920 \cite{lenz-1920} to his student Ernst Ising, who then solved it as a part of his thesis in 1924 \cite{ising-1925}. 
+\bk
+The model consists of a $d$-dimensional lattice $\Lambda$ with a total of $N$ sites. Each site is assigned a value $\sigma_i = \pm 1$, resemblant of the orientation of the spin of a given magnetic material. At any given time, we describe the state of all lattice sites with a given configuration, or microstate, $\ket{\sigma_1 \sigma_2 \dots \sigma_N}$. The Hamiltonian functional describing the total energy of the configuration is given by \cite{cipra-1987}
+\begin{equation}
+ H(\sigma) = -\sum_{\langle i,j\rangle} J_{ij}\sigma_i \sigma_j - \mu \sum_i h_{i}\sigma_i, 
+\label{eq:gen_H}
+\end{equation}
+where the summation convention $\langle i,j\rangle$ refers to summing over each pair of sites. This hints at a significant idealisation of the problem, where it is assumed that the interaction proceeds only through nearest neighbours on the lattice. Note also, that $\mu$ refers to the magnetic moment, $h_i$ the external magnetic field, and $J_{ij}$ the interaction strength. Depending on the sign of the latter, the material may be though of as a ferromagnet $(J_{ij} > 0)$ or an antiferromagnet ($J_{ij} < 0$).
+\bk
+Yet another simplification arises when the so-called zero-field case is considered, with no external magnetic field applied ($h_i = 0$ for all $i$). Furthermore, $J_{ij}$ may be assumed to be a constant $J$ for each pair of spins. The effective Hamiltonian is then
+\begin{equation}
+ H(\sigma) = -J \sum_{\langle i, j \rangle} \sigma_i\sigma_j.
+\label{eq:red_H}
+\end{equation}
+By surrounding the system with a heat bath at a constant temperature $T$, it may be modelled in the canonical ensemble, with a probability of a given microstate given by the Boltzmann weight $p(\sigma) = e^{-\beta H(\sigma)}/Z$, where $Z$ is the canonical partition function,
+\begin{equation}
+Z = \sum_{\sigma} e^{-\beta H(\sigma)}.
+\label{eq:partition}
+\end{equation}
+Using this formulation, macroscopic properties of the system may be computed,
+\begin{equation}
+E \equiv \langle H \rangle = \sum_{\sigma}H(\sigma) p(\sigma) = \frac{1}{Z}\sum_{\sigma}H(\sigma)e^{-\beta H(\sigma)} = -\frac{1}{Z}\frac{\partial Z}{\partial \beta} = -\frac{\partial \ln Z}{\partial \beta},
+\label{eq:avg_E}
+\end{equation}
+\begin{equation}
+M = \sum_{i=1}^{N} \sigma_i.
+\label{eq:magnetisation}
+\end{equation}
+
+\begin{example}[One-dimensional Ising Model]
+Consider for simplicity the situation with $d=1$ and $N = 3$, such that the Hamiltonian for the system is given by \cite{cipra-1987}
+\[H(\sigma_1, \sigma_2, \sigma_3) = -J(\sigma_i\sigma_2 + \sigma_2\sigma_3).\]
+Note that we have not introduced periodic boundary conditions, since in the thermodynamic limit it will not influence the result. Computing the partition function is equivalent to summing over the different values of $\sigma$.
+\[Z = \sum_{\sigma_1=\pm1}\sum_{\sigma_2 = \pm1}\sum_{\sigma_3=\pm1}e^{-\beta H(\sigma_1, \sigma_2, \sigma_3)} = 2e^{2\beta J} + 2e^{-2\beta J} + 4 = 2^3\cosh^2(\beta J) = 2^N\cosh^{N-1}(\beta J)\]
+This result, in fact is valid for any $N$ in the one-dimensional case. Moreover in the thermodynamic limit of $N$ large,
+\begin{equation}
+Z \approx (2\cos\beta J)^N.
+\label{eq:1d_Z}
+\end{equation}
+    
+\end{example}
+
+\newpage
+\section*{Bibliography}
+\printbibliography[heading=none]
+
+\end{document}
