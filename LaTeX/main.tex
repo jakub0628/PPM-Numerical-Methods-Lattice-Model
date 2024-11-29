@@ -287,12 +287,18 @@ Using this specific form of the function, we may consider an example of the algo
         e^{-2\beta} & 0 & 0 & e^{-2\beta} \\
         0 & 1 & 1 & 2(1-e^{-2\beta})
     \end{pmatrix}.\]
-    In real applications it suffices to put forward a proposal for the next state and calculate the acceptance rate for the next state in the Markov chain. Notice that $A$ may be written more compactly,
+    In real applications it suffices to put forward a proposal for the next state and calculate the acceptance rate for the next state in the Markov chain. Notice that $A$ may be written more compactly by defining $\Delta H = H_j - H_i$
     \[A = \begin{cases}
-        e^{-\beta(H_j- H_i)} \quad \text{ if } H_j - H_i > 0 \\
+        e^{-\beta\Delta H} \quad \text{ if } \Delta H > 0 \\
         1\quad\quad\quad\quad\quad \text{ else}
     \end{cases}.\]
-    From this expression, we may note that the Metropolis-Hastings algorithm, given a current state of the spin proposes to map the spin onto its opposite value with a probability $1$ if the energy of the next state is lower than the previous one. Otherwise, if the energy is larger, there is still a probability of the spin flipping, being $e^{-\beta(H_j - H_i)},$ corresponding physically to random thermal fluctuations in the system.
+    From this expression, we may note that the Metropolis-Hastings algorithm, given a current state of the spin proposes to map the spin onto its opposite value with a probability $1$ if the energy of the next state is lower than the previous one. Otherwise, if the energy is larger, there is still a probability of the spin flipping, being $e^{-\beta(H_j - H_i)},$ corresponding physically to random thermal fluctuations in the system. The plot of the function may be found in figure \ref{fig:metropolis} below.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.7]{figures/metropolis.png}
+        \caption{Plot of the Metropolis-Hastings distribution as a function of energy change, for various values of the inverse temperature $\beta$.}
+        \label{fig:metropolis}
+    \end{figure}
 \end{example}
 \subsection{Glauber acceptance function}
 An alternative to the Metropolis-Hastings function is the so-called Glauber function
@@ -311,6 +317,22 @@ In complete matrix form, $A$ may be represented as follows
     \frac{2}{1+e^{2\beta}} & 1 & 1 & \frac{2}{1+e^{2\beta}} \\
     1 & \frac{2}{1+e^{-2\beta}} & \frac{2}{1+e^{-2\beta}} & 1
 \end{pmatrix}.\]
+A given spin state will flip, according to the proposal condition, with a different probability than the one of Metropolis. Notably, it is not sure that the spin will flip, even if the configuration yields a more energetically favourable arrangement. $A$ may be written more compactly
+\[A = \begin{cases}
+    (1+e^{\beta\Delta H})^{-1} \quad \text{ if } \Delta H \neq 0 \\
+   \quad \quad 1/2\quad\quad\quad\quad\quad \text{ else}
+\end{cases}.\]
+Therefore, the probability of the spin flip occurring is simply the Glauber function \eqref{eq:glauber} with $z = e^{\beta H}$
+\[p(\Delta H) = \frac{1}{1+e^{\beta \Delta H}}.\]
+The plot of the function is provided in figure \ref{fig:glauber} below.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{figures/glauber.png}
+    \caption{Plot of the Glauber distribution as a function of energy change, for various values of the inverse temperature $\beta$.}
+    \label{fig:glauber}
+\end{figure}
+
+\noindent Comparing this plot with figure \ref{fig:metropolis}, we may notice that both probability distributions converge to a step function at low temperatures (large $\beta$), and hence are perfectly equivalent in this regime. Moreover, they should yield the same results at thermal equilibrium. The differences between the two algorithms become important at high temperatures. Nevertheless, they both satisfy ergodicity and the detailed balance conditions. 
 \end{example}
 \newpage
 \section*{Bibliography}
