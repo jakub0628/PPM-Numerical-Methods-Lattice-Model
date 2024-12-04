@@ -28,3 +28,6 @@
 *.synctex(busy)
 *.synctex.gz
 *.synctex.gz(busy)
+
+# Jupyer notebooks
+*.ipynb
