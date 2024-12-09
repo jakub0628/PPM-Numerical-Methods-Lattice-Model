@@ -1,19 +1,17 @@
-### A Pluto.jl notebook ###
-# v0.20.3
+## # A Pluto.jl notebook ## # 
+# v0.20.0
 
 using Markdown
 using InteractiveUtils
 
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
-    #! format: off
     quote
         local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
-    #! format: on
 end
 
 # ╔═╡ da5852ec-2998-4e09-9409-4a961d7e596a
@@ -23,154 +21,154 @@ begin
 end
 
 # ╔═╡ b21b9631-3b88-4530-9466-08ae2bade989
-TableOfContents(title="Sections:",indent=true)
+TableOfContents(title="Sections:", indent=true)
 
 # ╔═╡ f74c08e4-7435-4ddf-8570-7808766d5041
 begin
-	k_B = 1.38e-23 #Define the Boltzmann constant
+	k_B = 1.38e-23 # Define the Boltzmann constant
 	
 	function spin(d::Int)
 			# Generate and normalize a d-dimensional vector
-			vec = rand(Uniform(-1,1),d)
+			vec = rand(Uniform(-1, 1), d)
 			return vec ./ norm(vec)
 		end
 	
 	mutable struct Grid
-		#Create a struct to generate and store the m*n grid of d-dimensional spins
-		m::Int #grid height
-		n::Int #grid length
-		d::Int #spin dimension
-		β::Float64 #thermodynamic beta
-		Glauber::Bool #Use Glauber or Boltzmann dist
-		J::Float64 #Coupling strength
-		shape::String #shape of the lattice
-		s::Matrix{Vector{Float64}} #grid of the spins
+		# Create a struct to generate and store the m*n grid of d-dimensional spins
+		m::Int # grid height
+		n::Int # grid length
+		d::Int # spin dimension
+		β::Float64 # thermodynamic beta
+		Glauber::Bool # Use Glauber or Boltzmann dist
+		J::Float64 # Coupling strength
+		shape::String # shape of the lattice
+		s::Matrix{Vector{Float64}} # grid of the spins
 	
-		function Grid(; m=100,n=100,d=2,β=1e2,Glauber=false,J=1,shape="Square") #creates and fills the m*n grid of d-dimensional spins using the default values
-			new(m,n,d,β,Glauber,J,shape,[spin(d) for i in 1:m, j in 1:n]) 
+		function Grid(; m=100, n=100, d=2, β=1e2, Glauber=false, J=1, shape="Square") # creates and fills the m*n grid of d-dimensional spins using the default values
+			new(m, n, d, β, Glauber, J, shape, [spin(d) for i in 1:m, j in 1:n]) 
 		end
 	end
 
-	function neighbours(S::Grid,i::Int,j::Int) #obtains the sum of the neighbours for the energy calculation
-		#Get the sum of neighbours of s[i,j], periodic boundary conditions
-		NN = S.s[ifelse(i == 1, S.m, i-1), j] #north neighbour
-		SS = S.s[ifelse(i == S.m, 1, i+1), j] #south neighbour
-		WW = S.s[i, ifelse(j == 1, S.n, j-1)] #west neighour
-		EE = S.s[i, ifelse(j == S.n, 1, j+1)] #east neigbour
-		if S.shape == "Square" #if square lattice no mor neighbours
-			NW,SW = 0,0
-		elseif S.shape =="Triangular" #if triangular lattice add the extra neighbours
-			if i==1 #if top row
-				if j==1 #if top left corner
-					NW,SW = S.s[S.m,S.n],S.s[2,S.n]
+	function neighbours(S::Grid, i::Int, j::Int) # obtains the sum of the neighbours for the energy calculation
+		# Get the sum of neighbours of s[i, j], periodic boundary conditions
+		NN = S.s[ifelse(i == 1, S.m, i-1), j] # north neighbour
+		SS = S.s[ifelse(i == S.m, 1, i+1), j] # south neighbour
+		WW = S.s[i, ifelse(j == 1, S.n, j-1)] # west neighbour
+		EE = S.s[i, ifelse(j == S.n, 1, j+1)] # east neighbour
+		if S.shape == "Square" # if square lattice no more neighbours
+			NW, SW = 0, 0
+		elseif S.shape =="Triangular" # if triangular lattice add the extra neighbours
+			if i == 1 # if top row
+				if j == 1 # if top left corner
+					NW, SW = S.s[S.m, S.n], S.s[2, S.n]
 				else 
-					NW,SW = S.s[S.m,j-1],S.s[2,j-1]
+					NW, SW = S.s[S.m, j-1], S.s[2, j-1]
 				end
-			elseif i==S.m #if bottom row
-				if j==1 #if bottom left corner
-					NW,SW = S.s[S.m-1,S.n],S.s[1,S.n]
+			elseif i == S.m # if bottom row
+				if j == 1 # if bottom left corner
+					NW, SW = S.s[S.m-1, S.n], S.s[1, S.n]
 				else
-					NW,SW = S.s[S.m-1,j-1],S.s[1,j-1]
+					NW, SW = S.s[S.m-1, j-1], S.s[1, j-1]
 				end
-			elseif j==1 #if left column
-				NW,SW = S.s[i-1,S.n],S.s[i+1,S.n]
+			elseif j == 1 # if left column
+				NW, SW = S.s[i-1, S.n], S.s[i+1, S.n]
 			else
-				NW,SW = S.s[i-1,j-1],S.s[i+1,j-1]
+				NW, SW = S.s[i-1, j-1], S.s[i+1, j-1]
 			end
 		end
-		return NN+SS+WW+EE.+NW.+SW #return sum of the neighbours
+		return NN + SS + WW + EE .+ NW .+ SW # return sum of the neighbours
 	end
 
-	function evolve(S::Grid ; niters::Float64=1e7,store::Bool=false,red::Float64=1e4) #evolves the grid for niters iterations using the Glauber or Boltzmann prob and stores them with the appropriate point reduction if needed
+	function evolve(S::Grid; niters::Float64=1e7, store::Bool=false, red::Float64=1e4) # evolves the grid for niters iterations using the Glauber or Boltzmann prob and stores them with the appropriate point reduction if needed
 		if store  
-			T = Array{Matrix{Vector{Float64}}}(undef,Int(niters/red)) 
-			#T[1] = S.s
+			T = Array{Matrix{Vector{Float64}}}(undef, Int(niters/red)) 
+			# T[1] = S.s
 		else
 			T = 0 
 		end
 		for iter in 1:niters
-			i,j = rand(1:S.m), rand(1:S.n)
+			i, j = rand(1:S.m), rand(1:S.n)
 			sf = spin(S.d)
-			ΔE = S.J.*dot(neighbours(S,i,j),(S.s[i,j]-sf))
-			S.s[i,j] = ifelse(S.Glauber,
-				ifelse((rand() < 1/(1+exp(-S.β*ΔE))), 
-				sf, S.s[i,j]),
-				ifelse((rand() < exp(-S.β*ΔE)) || (ΔE<0), 
-				sf, S.s[i,j]))
-			if store &(iter%red==0)
-				Sc =copy(S.s)
+			ΔE = S.J.*dot(neighbours(S, i, j), (S.s[i, j] - sf))
+			S.s[i, j] = ifelse(S.Glauber, 
+				ifelse((rand() < 1 / (1+exp(-S.β * ΔE))), 
+				sf, S.s[i, j]), 
+				ifelse((rand() < exp(-S.β * ΔE)) || (ΔE < 0), 
+				sf, S.s[i, j]))
+			if store &(iter%red == 0)
+				Sc = copy(S.s)
 				T[Int(iter/red)] = Sc
 			end
 		end
 		if store
-			return (T,red)
+			return (T, red)
 		else 
 			return nothing
 		end
 	end
 
-	function vis(S::Grid ; anim::Bool=false,hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]],0.0)) #plots the function for 1 or 2 dimensional spins with the option to animate if the evolution was stored
+	function vis(S::Grid; anim::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]], 0.0)) # plots the function for 1 or 2 dimensional spins with the option to animate if the evolution was stored
 		T, red = hist
-		if S.d == 1 #if 1D spin
+		if S.d == 1 # if 1D spin
 			if anim
 				p = [[j[1] for j in i] for i in T]
 				@gif for i in 1:length(T)
-					heatmap(p[i],title = "$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber,"Glauber","Boltzmann"))",c = :binary,showaxis=false,bottom_margin=-20Plots.px,left_margin=-30Plots.px)
+					heatmap(p[i], title="$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber, "Glauber", "Boltzmann"))", c=:binary, showaxis=false, bottom_margin=-20Plots.px, left_margin=-30Plots.px)
 					 end
-			else #if only plot of last state
+			else # if only plot of last state
 				p = [i[1] for i in S.s]
-				heatmap(p,title = "$(ifelse(S.Glauber,"Glauber","Boltzmann"))",c = :binary,showaxis=false,bottom_margin=-20Plots.px,left_margin=-30Plots.px)
+				heatmap(p, title="$(ifelse(S.Glauber, "Glauber", "Boltzmann"))", c=:binary, showaxis=false, bottom_margin=-20Plots.px, left_margin=-30Plots.px)
 			end
-		elseif S.d == 2 #if 2D spin
+		elseif S.d == 2 # if 2D spin
 			if anim
-				Angs = [atan.(getindex.(i,2)./getindex.(i,1)) for i in T]
+				Angs = [atan.(getindex.(i, 2) ./ getindex.(i, 1)) for i in T]
 				@gif for i in 1:length(T)
-					heatmap(Angs[i],clims=(-pi/2,pi/2),c=:lightrainbow,showaxis=false,bottom_margin=-20Plots.px,left_margin=-30Plots.px,title =  "$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber,"Glauber","Boltzmann"))")
+					heatmap(Angs[i], clims=(-pi/2, pi/2), c=:lightrainbow, showaxis=false, bottom_margin=-20Plots.px, left_margin=-30Plots.px, title="$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber, "Glauber", "Boltzmann"))")
 					 end
-			else #if only plot of last state
-				Ang = atan.(getindex.(S.s,2)./getindex.(S.s,1))
-				heatmap(Ang,clims=(-pi/2,pi/2),c=:lightrainbow,showaxis=false,bottom_margin=-20Plots.px,left_margin=-30Plots.px,title = "$(ifelse(S.Glauber,"Glauber","Boltzmann"))")
+			else # if only plot of last state
+				Ang = atan.(getindex.(S.s, 2) ./ getindex.(S.s, 1))
+				heatmap(Ang, clims=(-pi/2, pi/2), c=:lightrainbow, showaxis=false, bottom_margin=-20Plots.px, left_margin=-30Plots.px, title="$(ifelse(S.Glauber, "Glauber", "Boltzmann"))")
 			end
 		end
 	end
 
-	function av_energy(S::Grid ;vis::Bool=false,hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]],0.0)) #returns the average energy of the grid with the option to dsiplay its evolution over the iterations
+	function av_energy(S::Grid; vis::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]], 0.0)) # returns the average energy of the grid with the option to display its evolution over the iterations
 		T, red = hist
 		if vis
-			plot([ 1/2*mean([-S.J.*dot(neighbours(S,i,j),t[i,j]) for i in 1:S.m, j in 1:S.n]) for t in T],xlabel="N of iterations/$(red)",ylabel="Av. E",legend=false,title="Average Energy over each iteration")
+			plot([1/2 * mean([-S.J .* dot(neighbours(S, i, j), t[i, j]) for i in 1:S.m, j in 1:S.n]) for t in T], xlabel="N of iterations/$(red)", ylabel="Av. E", legend=false, title="Average Energy over each iteration")
 		else
-			return 1/2*mean([-S.J.*dot(neighbours(S,i,j),S.s[i,j]) for i in 1:S.m, j in 1:S.n])
+			return 1/2 * mean([-S.J .* dot(neighbours(S, i, j), S.s[i, j]) for i in 1:S.m, j in 1:S.n])
 		end
 	end
 
-	function av_mag(S::Grid ;vis::Bool=false,hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]],0.0)) #returns the average magnetization of the grid
+	function av_mag(S::Grid ;vis::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]], 0.0)) # returns the average magnetization of the grid
 		T, red = hist
 		if vis
-			plot([norm(mean(t)) for t in T],xlabel="N of iterations/$(red)",ylabel="Av. |M|",legend=false,title="Average Magnetisation over each iteration")
+			plot([norm(mean(t)) for t in T], xlabel="N of iterations/$(red)", ylabel="Av. |M|", legend=false, title="Average Magnetisation over each iteration")
 		else
 			norm(mean(S.s))
 		end
 	end
 
-	function CV(S::Grid ;vis::Bool=false,hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]],0.0)) #returns the specific heat capacity of the grid
+	function CV(S::Grid ;vis::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]], 0.0)) # returns the specific heat capacity of the grid
 		T, red = hist
 		if vis
-			plot([S.β^2*(1/2*mean([(-S.J.*dot(neighbours(S,i,j),t[i,j]))^2 for i in 1:S.m, j in 1:S.n])-1/2*mean([(-S.J.*dot(neighbours(S,i,j),t[i,j])) for i in 1:S.m, j in 1:S.n])^2)  for t in T],xlabel="N of iterations/$(red)",ylabel="CV/k_B",legend=false,title="Heat capacity over each iteration")
+			plot([S.β^2 * (1/2 * mean([(-S.J .* dot(neighbours(S, i, j), t[i, j]))^2 for i in 1:S.m, j in 1:S.n]) - 1/2 * mean([(-S.J .* dot(neighbours(S, i, j), t[i, j])) for i in 1:S.m, j in 1:S.n])^2) for t in T], xlabel="N of iterations/$(red)", ylabel="CV/k_B", legend=false, title="Heat capacity over each iteration")
 		else
-			S.β^2*(1/2*mean([(-S.J.*dot(neighbours(S,i,j),S.s[i,j]))^2 for i in 1:S.m, j in 1:S.n])-av_energy(S)^2) 
+			S.β^2 * (1/2 * mean([(-S.J .* dot(neighbours(S, i, j), S.s[i, j]))^2 for i in 1:S.m, j in 1:S.n]) - av_energy(S)^2) 
 		end
 	end
 
-	function χ(S::Grid ;vis::Bool=false,hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]],0.0)) #returns the magnetic susceptibility of the grid
+	function χ(S::Grid ;vis::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float64}}}, Float64}=([[[[0.0]] [[0.0]]]], 0.0)) # returns the magnetic susceptibility of the grid
 		T, red = hist
 		if vis
-			plot([S.β*(1-norm(mean(t))^2)  for t in T],xlabel="N of iterations/$(red)",ylabel="χ",legend=false,title="Magnetic susceptibility over each iteration")
+			plot([S.β * (1-norm(mean(t))^2) for t in T], xlabel="N of iterations/$(red)", ylabel="χ", legend=false, title="Magnetic susceptibility over each iteration")
 		else
-			S.β*(1-norm(mean(S.s))^2) 
+			S.β * (1 - norm(mean(S.s))^2) 
 		end
 	end
 
-	function T_sweep(; ) #performs a temperature sweep 
+	function T_sweep(; ) # performs a temperature sweep 
 		return nothing
 	end
 end
@@ -191,8 +189,8 @@ end
 # ╔═╡ 928d6341-cbfa-43c2-9ecf-5804268c1de4
 if Sq
 	g1a = Grid(d=1)
-	gf1a = evolve(g1a,store=true)
-	vis(g1a,anim=true,hist=gf1a)
+	gf1a = evolve(g1a, store=true)
+	vis(g1a, anim=true, hist=gf1a)
 end
 
 # ╔═╡ 795e4e66-647f-49c1-be53-fc85cc5a8a14
@@ -208,8 +206,8 @@ end
 # ╔═╡ 3d746977-c29f-46c6-8654-fdafb6428841
 if Sq
 	g2a = Grid()
-	gf2a = evolve(g2a,store=true)
-	vis(g2a,anim=true,hist=gf2a)
+	gf2a = evolve(g2a, store=true)
+	vis(g2a, anim=true, hist=gf2a)
 end
 
 # ╔═╡ b90adb07-1c2b-4dab-bb61-196e71c2f5a4
@@ -218,44 +216,44 @@ md"## Observables"
 # ╔═╡ bbb536a3-f357-4989-82f5-3bc04d1bab40
 if Sq
 	go = Grid(d=1)
-	gof = evolve(go,store=true,red=1e5,niters=8e7)
-	av_energy(go,vis=true,hist=gof)
+	gof = evolve(go, store=true, red=1e5, niters=8e7)
+	av_energy(go, vis=true, hist=gof)
 end
 
 # ╔═╡ 09d040ff-2751-461d-944d-efdeea154a5d
 if Sq
-	av_mag(go,vis=true,hist=gof)
+	av_mag(go, vis=true, hist=gof)
 end
 
 # ╔═╡ c0c45162-161f-4c7f-8eac-0fdeb6fbd4f0
 if Sq
-	CV(go,vis=true,hist=gof)
+	CV(go, vis=true, hist=gof)
 end
 
 # ╔═╡ 058f3e9e-97bc-4c60-86fb-5f7eba932a03
 if Sq
-	χ(go,vis=true,hist=gof)
+	χ(go, vis=true, hist=gof)
 end
 
 # ╔═╡ 79cfeb82-e6d3-41b4-a2ab-5c33725777bf
 begin
 	betas = 1e-1* 10 .^ (0:0.1:4)
-	E = Array{Float64}(undef,0)
-	M = Array{Float64}(undef,0)
-	C = Array{Float64}(undef,0)
-	X = Array{Float64}(undef,0)
+	E = Array{Float64}(undef, 0)
+	M = Array{Float64}(undef, 0)
+	C = Array{Float64}(undef, 0)
+	X = Array{Float64}(undef, 0)
 	for i in betas
-		g = Grid(m=10,n=10,d=1,β=i)
+		g = Grid(m=10, n=10, d=1, β=i)
 		evolve(g)
-		push!(E,av_energy(g))
-		push!(M,av_mag(g))
-		push!(C,CV(g))
-		push!(X,χ(g))
+		push!(E, av_energy(g))
+		push!(M, av_mag(g))
+		push!(C, CV(g))
+		push!(X, χ(g))
 	end
 end
 
 # ╔═╡ cc61be9d-7f6b-49d6-bc4b-ac579a9b8cbf
-scatter(betas,E,xlabel="β",ylabel="E",legend=false)
+scatter(betas, E, xlabel="β", ylabel="E", legend=false)
 
 # ╔═╡ 0190a985-085e-47ef-be09-7eaa0c091e2c
 md"# Triangular lattice $(@bind Tr CheckBox(default=false))"
@@ -265,7 +263,7 @@ md"## 1D"
 
 # ╔═╡ d23a1290-6a67-49d3-9cd5-ebfd9fcb8af5
 if Tr
-	g1t = Grid(d=1,shape="Triangular")
+	g1t = Grid(d=1, shape="Triangular")
 	evolve(g1t)
 	vis(g1t)
 end
@@ -273,8 +271,8 @@ end
 # ╔═╡ 8188adac-a599-40db-a42c-e20858b9ccb2
 if Tr
 	g1ta = Grid(d=1)
-	gf1ta = evolve(g1ta,store=true)
-	vis(g1ta,anim=true,hist=gf1ta)
+	gf1ta = evolve(g1ta, store=true)
+	vis(g1ta, anim=true, hist=gf1ta)
 end
 
 # ╔═╡ c821baef-fdd3-493f-b9c0-fcdc375dfbae
@@ -290,8 +288,8 @@ end
 # ╔═╡ b0bc8a78-7974-4892-8daf-654647c9e51c
 if Tr
 	g2ta = Grid()
-	gf2ta = evolve(g2ta,store=true)
-	vis(g2ta,anim=true,hist=gf2ta)
+	gf2ta = evolve(g2ta, store=true)
+	vis(g2ta, anim=true, hist=gf2ta)
 end
 
 # ╔═╡ d61e9876-9419-4b1f-8504-119a18802edc
@@ -299,24 +297,24 @@ md"## Observables"
 
 # ╔═╡ 0761baf5-541c-41b4-b931-d7da29e35826
 if Tr
-	got = Grid(d=1,shape="Triangular")
-	gotf = evolve(got,store=true,red=1e3)
-	av_energy(got,vis=true,hist=gotf)
+	got = Grid(d=1, shape="Triangular")
+	gotf = evolve(got, store=true, red=1e3)
+	av_energy(got, vis=true, hist=gotf)
 end
 
 # ╔═╡ 28e39281-5494-4516-964b-67bc53854804
 if Tr
-	av_mag(got,vis=true,hist=gotf)
+	av_mag(got, vis=true, hist=gotf)
 end
 
 # ╔═╡ 4424adf8-966d-4d84-b18e-64ec89e6c870
 if Tr
-	CV(got,vis=true,hist=gotf)
+	CV(got, vis=true, hist=gotf)
 end
 
 # ╔═╡ 8609cab4-c597-48fd-9a13-5e5d1d01fc50
 if Tr
-	χ(got,vis=true,hist=gotf)
+	χ(got, vis=true, hist=gotf)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
