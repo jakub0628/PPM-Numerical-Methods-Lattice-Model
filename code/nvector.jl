@@ -93,11 +93,11 @@ function vis(S::Grid ; anim::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float6
                     p[i], 
                     # title="$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber, "Glauber", "Boltzmann"))", 
                     c=:binary, 
-                    showaxis=false, 
+                    axis=([], false),
                     cbar=false,
                     size=(500, 500),
                     aspect_ratio=:equal,
-                    title="↑ / ↓ evolution for T / kʙ = $(1/(k_B * S.β))"
+                    title="↑ / ↓ evolution for T / kʙ = $(1/(S.β))"
                     )
                     end
         else # if only plot of last state
@@ -106,7 +106,7 @@ function vis(S::Grid ; anim::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float6
                 p, 
                 # title="$(ifelse(S.Glauber, "Glauber", "Boltzmann"))", 
                 c=:binary, 
-                showaxis=false,
+                axis=([], false),
                 cbar=false, 
                 size=(500, 500),
                 aspect_ratio=:equal,
@@ -127,7 +127,7 @@ function vis(S::Grid ; anim::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float6
                     size=(500, 500),
                     aspect_ratio=:equal,
                     # title="$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber, "Glauber", "Boltzmann"))"
-                    title="θ evolution for T / kʙ = $(1/(k_B * S.β))"
+                    title="θ evolution for T / kʙ = $(1/(S.β))"
                     )
                     end
         else # if only plot of last state
