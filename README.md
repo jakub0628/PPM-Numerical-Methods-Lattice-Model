@@ -50,7 +50,6 @@ E_i = - \sum_{\langle j \rangle}\mathbf{s}_{i} \cdot \mathbf{s}_{j}
 - [x] Find out how to implement the model
 - [x] Divide the tasks
 - [x] Implement the basic version of the algorithm
-- [ ] Treat different $n$ cases
-- [ ] Find physical interpretation
-- [ ] Make visualisations
-- [ ] Make presentation
+- [x] Treat different $n$ cases
+- [x] Make visualisations
+- [x] Make presentation
