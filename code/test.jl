@@ -1,22 +1,22 @@
 include("nvector.jl")
 
-Temps = 1e-3:1e-1:4
-betas = 1 ./(Temps)
-n = length(betas)
-E = Vector{Float64}(undef, n)
-M = Vector{Float64}(undef, n)
-C = Vector{Float64}(undef, n)
-X = Vector{Float64}(undef, n)
+# Temps = 1e-3:1e-1:4
+# betas = 1 ./(Temps)
+# n = length(betas)
+# E = Vector{Float64}(undef, n)
+# M = Vector{Float64}(undef, n)
+# C = Vector{Float64}(undef, n)
+# X = Vector{Float64}(undef, n)
 
-@threads for idx in 1:n
-    i = betas[idx]
-    g = Grid(m=100, n=100, d=3, β=i)
-    evolve(g, niters=1_000_000)
-    E[idx] = av_energy(g)
-    M[idx] = av_mag(g)
-    C[idx] = CV(g)
-    X[idx] = χ(g)
-end
+# @threads for idx in 1:n
+#     i = betas[idx]
+#     g = Grid(m=100, n=100, d=3, β=i)
+#     evolve(g, niters=1_000_000)
+#     E[idx] = av_energy(g)
+#     M[idx] = av_mag(g)
+#     C[idx] = CV(g)
+#     X[idx] = χ(g)
+# end
 
 # scatter(Temps[10:length(Temps)], C[10:length(C)], xlabel="T/k_B",ylabel="CV/K_B",legend=false)
 # scatter(Temps, C, xlabel="T/k_B",ylabel="CV/K_B",legend=false)
@@ -24,5 +24,5 @@ end
 # png("test.png")
 
 g1ta = Grid(d=2)
-gf1ta = evolve(g1ta, store=true)
+gf1ta = evolve(g1ta, store=true, niters=1_000_000)
 vis(g1ta, anim=true,hist=gf1ta)

@@ -91,22 +91,25 @@ function vis(S::Grid ; anim::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float6
             @gif for i in 1:length(T)
                 heatmap(
                     p[i], 
-                    title="$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber, "Glauber", "Boltzmann"))", 
+                    # title="$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber, "Glauber", "Boltzmann"))", 
                     c=:binary, 
                     showaxis=false, 
-                    bottom_margin=-20Plots.px, 
-                    left_margin=-30Plots.px
+                    cbar=false,
+                    size=(500, 500),
+                    aspect_ratio=:equal,
+                    title="↑ / ↓ evolution for T / kʙ = $(1/(k_B * S.β))"
                     )
                     end
         else # if only plot of last state
             p = [i[1] for i in S.s]
             heatmap(
                 p, 
-                title="$(ifelse(S.Glauber, "Glauber", "Boltzmann"))", 
+                # title="$(ifelse(S.Glauber, "Glauber", "Boltzmann"))", 
                 c=:binary, 
-                showaxis=false, 
-                bottom_margin=-20Plots.px, 
-                left_margin=-30Plots.px
+                showaxis=false,
+                cbar=false, 
+                size=(500, 500),
+                aspect_ratio=:equal,
                 )
         end
     
@@ -119,10 +122,12 @@ function vis(S::Grid ; anim::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float6
                     Angs[i], 
                     clims=(-pi/2, pi/2), 
                     c=:lightrainbow, 
-                    showaxis=false, 
-                    bottom_margin=-20Plots.px, 
-                    left_margin=-30Plots.px, 
-                    title="$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber, "Glauber", "Boltzmann"))"
+                    axis=([], false),
+                    cbar=false,
+                    size=(500, 500),
+                    aspect_ratio=:equal,
+                    # title="$(i*red) of $(length(T)*red) for $(ifelse(S.Glauber, "Glauber", "Boltzmann"))"
+                    title="θ evolution for T / kʙ = $(1/(k_B * S.β))"
                     )
                     end
         else # if only plot of last state
@@ -131,10 +136,11 @@ function vis(S::Grid ; anim::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float6
                 Ang, 
                 clims=(-pi/2, pi/2), 
                 c=:lightrainbow, 
-                showaxis=false, 
-                bottom_margin=-20Plots.px, 
-                left_margin=-30Plots.px, 
-                title="$(ifelse(S.Glauber, "Glauber", "Boltzmann"))"
+                axis=([], false),
+                cbar=false,
+                size=(500, 500),
+                aspect_ratio=:equal,
+                # title="$(ifelse(S.Glauber, "Glauber", "Boltzmann"))"
                 )
         end
     
@@ -164,9 +170,9 @@ end
 function CV(S::Grid ;vis::Bool=false, hist::Tuple{Vector{Matrix{Vector{Float64}}}, Int}=([[[[0.0]] [[0.0]]]], 0)) # returns the specific heat capacity of the grid
     T, red = hist
     if vis
-        Ex1(i, j, t) = -S.J * dot(neighbours!(S, i, j), t[i, j])
-        varE1(t) = var([Ex1(i, j, t) for i in 1:S.m, j in 1:S.n])
-        cs = [S.β^2 * varE1(t) for t in T]
+        E(i, j, t) = -S.J * dot(neighbours!(S, i, j), t[i, j])
+        varE(t) = var([E(i, j, t) for i in 1:S.m, j in 1:S.n])
+        cs = [S.β^2 * varE(t) for t in T]
         
         plot(cs, xlabel="N of iterations/$(red)", ylabel="CV/k_B", legend=false, title="Heat capacity over each iteration")
     
